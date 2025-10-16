@@ -285,12 +285,13 @@
             audioChunks = [];
             mediaRecorder.ondataavailable = e => { if (e.data.size) audioChunks.push(e.data); };
             mediaRecorder.onstop = () => {
-              const blob = new Blob(audioChunks, { type: mime });
+              const blob = new Blob(audioChunks, { type: "audio/mpeg" });
               const url = URL.createObjectURL(blob);
               const a = document.createElement('a');
               a.href = url;
-              a.download = `xromeda_record_${new Date().toISOString().replace(/[:.]/g, '-')}.mp3`;
-              a.click(); URL.revokeObjectURL(url);
+              a.download = `XROMEDA_Record_${new Date().toISOString().replace(/[:.]/g, '-')}.mp3`;
+              a.click();
+              URL.revokeObjectURL(url);
             };
             mediaRecorder.start();
             isRecording = true;
