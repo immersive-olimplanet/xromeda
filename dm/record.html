@@ -51,12 +51,46 @@
 </head>
 <body>
 
-<button class="mic-cta" id="micBtn">🎙️ 마이크 비주얼 시작</button>
+<button class="mic-cta" id="recordBtn" style="bottom:calc(var(--wave-height) + 60px)">🔴 녹음 시작</button>
 
 <div class="sound-wave-wrap" aria-hidden="true">
   <canvas id="wave" class="sound-wave"></canvas>
 </div>
+<script>
+let mediaRecorder, audioChunks = [], isRecording = false;
 
+document.getElementById('recordBtn').addEventListener('click', async () => {
+  if (!analyser) {
+    alert('먼저 "마이크 비주얼 시작" 버튼을 눌러 주세요.');
+    return;
+  }
+
+  if (!isRecording) {
+    // 녹음 시작
+    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    mediaRecorder = new MediaRecorder(stream);
+    mediaRecorder.ondataavailable = e => audioChunks.push(e.data);
+    mediaRecorder.onstop = () => {
+      const blob = new Blob(audioChunks, { type: 'audio/webm' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'vrook_record.webm';
+      a.click();
+      URL.revokeObjectURL(url);
+      audioChunks = [];
+    };
+    mediaRecorder.start();
+    isRecording = true;
+    document.getElementById('recordBtn').textContent = '⏹️ 녹음 정지';
+  } else {
+    // 녹음 종료
+    mediaRecorder.stop();
+    isRecording = false;
+    document.getElementById('recordBtn').textContent = '🔴 녹음 시작';
+  }
+});
+</script>
 <script>
 (() => {
   /** ===== 설정 ===== */
@@ -185,4 +219,3 @@
 </script>
 </body>
 </html>
-
