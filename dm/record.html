@@ -1,231 +1,316 @@
 <!doctype html>
 <html lang="ko">
+
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Bottom Sound Wave + Record</title>
-<style>
-  :root{
-    --wave-height: 34vh;
-    --blur: 10px;
-    --opacity: 0.95;
-  }
-  body{
-    margin:0;
-    min-height:100vh;
-    background: #000;
-    /* background: transparent; */ /* ✅ 투명 배경 */
-    color:#fff;
-    font-family: "Pretendard Variable", Inter, system-ui, -apple-system,
-                 "Segoe UI", Roboto, "Noto Sans KR", "Apple SD Gothic Neo", sans-serif;
-  }
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>XROMEDA Record</title>
+  <style>
+    :root {
+      --wave-height: 34vh;
+      --blur: 10px;
+      --opacity: 0.95;
+    }
 
-  /* ====== 웨이브 ====== */
-  .sound-wave-wrap{
-    position:fixed; left:0; right:0; bottom:0; height:var(--wave-height);
-    pointer-events:none; z-index:0;
-  }
-  .sound-wave{
-    position:absolute; inset:0; width:100%; height:100%; display:block;
-    filter: blur(var(--blur)); opacity: var(--opacity); mix-blend-mode: screen;
-  }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: #000;
+      /* background: transparent; */
+      /* ✅ 투명 배경 */
+      color: #fff;
+      font-family: "Pretendard Variable", Inter, system-ui, -apple-system,
+        "Segoe UI", Roboto, "Noto Sans KR", "Apple SD Gothic Neo", sans-serif;
+    }
 
-  /* ====== 녹음 버튼 ====== */
-  .btn{
-    position:fixed; left:50%; transform:translateX(-50%); z-index:10;
-    background:#ffffff12; color:#fff; border:1px solid #ffffff33;
-    padding:10px 14px; border-radius:999px; backdrop-filter: blur(6px);
-    font-weight:600; cursor:pointer;
-    bottom: calc(var(--wave-height) + 16px);
-  }
+    /* ====== 웨이브 ====== */
+    .sound-wave-wrap {
+      position: fixed;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      height: var(--wave-height);
+      pointer-events: none;
+      z-index: 0;
+    }
 
-  /* ====== 중앙 녹음 인디케이터 ====== */
-  .rec-indicator{
-    position:fixed; inset:0;
-    display:flex; align-items:center; justify-content:center;
-    opacity:0; pointer-events:none;
-    z-index:20;
-    transition: opacity 0.4s ease; /* ✅ fade-in/out */
-  }
-  .rec-indicator.show{
-    opacity:1; pointer-events:none;
-  }
+    .sound-wave {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      display: block;
+      filter: blur(var(--blur));
+      opacity: var(--opacity);
+      mix-blend-mode: screen;
+    }
 
-  .rec-card{
-    display:flex; flex-direction:column; align-items:center; gap:8px;
-    background:#111111b3; border:1px solid #ffffff22; color:#fff;
-    padding:14px 18px; border-radius:16px; backdrop-filter: blur(8px);
-    box-shadow: 0 10px 30px #0006; min-width: 180px;
-    transition: all .3s ease;
-  }
-  .rec-row{
-    display:flex; align-items:center; gap:8px; font-weight:700; letter-spacing:.2px;
-  }
-  .dot{
-    width:10px; height:10px; border-radius:50%; background:#FE4141;
-    box-shadow:0 0 0 0 rgba(255,71,71,.7); animation: pulse 1.2s ease-in-out infinite;
-  }
-  @keyframes pulse {
-    0% { box-shadow:0 0 0 0 rgba(255,71,71,.65) }
-    70%{ box-shadow:0 0 0 10px rgba(255,71,71,0) }
-    100%{ box-shadow:0 0 0 0 rgba(255,71,71,0) }
-  }
-  .timer{
-    font-variant-numeric: tabular-nums;
-    font-weight:700; opacity:.9;
-  }
-  .rec-card.done .dot{ background:#8b8b8b; animation:none; box-shadow:none; }
-  .rec-card.done{ border-color:#ffffff1a; }
-</style>
+    /* ====== 녹음 버튼 ====== */
+    .btn {
+      position: fixed;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 10;
+      background: #ffffff12;
+      color: #fff;
+      border: 1px solid #ffffff33;
+      padding: 10px 14px;
+      border-radius: 999px;
+      backdrop-filter: blur(6px);
+      font-weight: 600;
+      cursor: pointer;
+      margin-top: 20px;
+    }
+
+    /* ====== 중앙 녹음 인디케이터 ====== */
+    .rec-indicator {
+      position: fixed;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      pointer-events: none;
+      z-index: 20;
+      transition: opacity 0.4s ease;
+      /* ✅ fade-in/out */
+    }
+
+    .rec-indicator.show {
+      opacity: 1;
+      pointer-events: none;
+    }
+
+    .rec-card {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      background: #111111b3;
+      border: 1px solid #ffffff22;
+      color: #fff;
+      padding: 14px 18px;
+      border-radius: 16px;
+      backdrop-filter: blur(8px);
+      box-shadow: 0 10px 30px #0006;
+      min-width: 180px;
+      transition: all .3s ease;
+    }
+
+    .rec-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 700;
+      letter-spacing: .2px;
+    }
+
+    .dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: #FE4141;
+      box-shadow: 0 0 0 0 rgba(255, 71, 71, .7);
+      animation: pulse 1.2s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0% {
+        box-shadow: 0 0 0 0 rgba(255, 71, 71, .65)
+      }
+
+      70% {
+        box-shadow: 0 0 0 10px rgba(255, 71, 71, 0)
+      }
+
+      100% {
+        box-shadow: 0 0 0 0 rgba(255, 71, 71, 0)
+      }
+    }
+
+    .timer {
+      font-variant-numeric: tabular-nums;
+      font-weight: 700;
+      opacity: .9;
+    }
+
+    .rec-card.done .dot {
+      background: #8b8b8b;
+      animation: none;
+      box-shadow: none;
+    }
+
+    .rec-card.done {
+      border-color: #ffffff1a;
+    }
+  </style>
 </head>
+
 <body>
 
-<button class="btn" id="recordBtn">🔴 녹음 시작</button>
+  <button class="btn" id="recordBtn">🔴 녹음 시작</button>
 
-<!-- 중앙 녹음 상태 표시 -->
-<div class="rec-indicator" id="recIndicator" aria-live="polite" aria-atomic="true">
-  <div class="rec-card" id="recCard">
-    <div class="rec-row"><span class="dot"></span><span id="recLabel">녹음 중입니다</span></div>
-    <div class="timer" id="recTimer">00:00:00</div>
+  <!-- 중앙 녹음 상태 표시 -->
+  <div class="rec-indicator" id="recIndicator" aria-live="polite" aria-atomic="true">
+    <div class="rec-card" id="recCard">
+      <div class="rec-row"><span class="dot"></span><span id="recLabel">녹음 중입니다</span></div>
+      <div class="timer" id="recTimer">00:00:00</div>
+    </div>
   </div>
-</div>
 
-<div class="sound-wave-wrap" aria-hidden="true">
-  <canvas id="wave" class="sound-wave"></canvas>
-</div>
+  <div class="sound-wave-wrap" aria-hidden="true">
+    <canvas id="wave" class="sound-wave"></canvas>
+  </div>
 
-<script>
-(() => {
-  let micStream=null, audioCtx=null, analyser=null, dataArray=null;
-  let mediaRecorder=null, isRecording=false, audioChunks=[];
-  let recStartMs=0, recTicker=null;
+  <script>
+    (() => {
+      let micStream = null, audioCtx = null, analyser = null, dataArray = null;
+      let mediaRecorder = null, isRecording = false, audioChunks = [];
+      let recStartMs = 0, recTicker = null;
 
-  const canvas=document.getElementById('wave');
-  const ctx=canvas.getContext('2d');
-  const recordBtn=document.getElementById('recordBtn');
-  const recIndicator=document.getElementById('recIndicator');
-  const recCard=document.getElementById('recCard');
-  const recLabel=document.getElementById('recLabel');
-  const recTimerEl=document.getElementById('recTimer');
+      const canvas = document.getElementById('wave');
+      const ctx = canvas.getContext('2d');
+      const recordBtn = document.getElementById('recordBtn');
+      const recIndicator = document.getElementById('recIndicator');
+      const recCard = document.getElementById('recCard');
+      const recLabel = document.getElementById('recLabel');
+      const recTimerEl = document.getElementById('recTimer');
 
-  const CONFIG={layers:3, baseAmp:22, maxBoost:80, speed:[0.85,1.1,1.5], alpha:[0.6,0.48,0.38]};
-  const BASE_HEX="#FFFFFF", ACTIVE_HEX="#FE4141";
+      const CONFIG = { layers: 3, baseAmp: 22, maxBoost: 100, speed: [0.85, 1.1, 1.5], alpha: [0.6, 0.48, 0.38] };
+      const BASE_HEX = "#FFFFFF", ACTIVE_HEX = "#FE4141";
+      const COLOR_SENSITIVITY = 2.2;   // 마이크 감도 부스트(1.0~3.0 권장)
+      const COLOR_GAMMA = 0.7;         // 곡선(0.5~1.0, 작을수록 민감)
+      const MIN_ACTIVE_MIX = 0.4;     // 녹음 중 최소 빨강 비율 보장(0~1)
 
-  let w=0,h=0,time=0,level=0,levelSmooth=0;
-  function resize(){
-    const rect=canvas.getBoundingClientRect();
-    canvas.width=Math.ceil(rect.width*devicePixelRatio);
-    canvas.height=Math.ceil(rect.height*devicePixelRatio);
-    ctx.setTransform(devicePixelRatio,0,0,devicePixelRatio,0,0);
-    w=rect.width;h=rect.height;
-  }
-  addEventListener('resize',resize,{passive:true});resize();
-
-  const hexToRgb=hex=>{const n=parseInt(hex.slice(1),16);return[(n>>16)&255,(n>>8)&255,n&255]};
-  const lerpColor=(c1,c2,t)=>c1.map((v,i)=>Math.round(v+(c2[i]-v)*t));
-  const BASE_RGB=hexToRgb(BASE_HEX), ACTIVE_RGB=hexToRgb(ACTIVE_HEX);
-  const pad2=n=>n.toString().padStart(2,'0');
-  const formatDuration = (ms) => {
-  const total = Math.floor(ms / 1000);
-  const h = Math.floor(total / 3600);
-  const m = Math.floor((total % 3600) / 60);
-  const s = total % 60;
-  return `${pad2(h)}:${pad2(m)}:${pad2(s)}`;
-};
-  async function ensureMic(){
-    if(micStream)return;
-    micStream=await navigator.mediaDevices.getUserMedia({audio:true});
-    audioCtx=new(window.AudioContext||window.webkitAudioContext)();
-    const src=audioCtx.createMediaStreamSource(micStream);
-    analyser=new AnalyserNode(audioCtx,{fftSize:1024});
-    src.connect(analyser);
-    dataArray=new Uint8Array(analyser.frequencyBinCount);
-  }
-
-  function getLevel(){
-    if(!analyser)return 0;
-    analyser.getByteTimeDomainData(dataArray);
-    let sum=0;
-    for(let i=0;i<dataArray.length;i++){
-      const v=(dataArray[i]-128)/128; sum+=v*v;
-    }
-    const rms=Math.sqrt(sum/dataArray.length);
-    return Math.min(1,Math.max(0,(rms-0.02)/0.28));
-  }
-
-  function drawWave(yBase,amp,alpha,phaseSpeed){
-    ctx.beginPath();
-    const step=8;
-    for(let x=0;x<=w;x+=step){
-      const t=time*phaseSpeed+x*0.012;
-      const y=yBase-Math.sin(t)*amp*0.9-Math.cos(t*0.7)*amp*0.4;
-      if(x===0)ctx.moveTo(0,y);else ctx.lineTo(x,y);
-    }
-    ctx.lineTo(w,h);ctx.lineTo(0,h);ctx.closePath();
-    const mix=lerpColor(BASE_RGB,ACTIVE_RGB,levelSmooth);
-    const grad=ctx.createLinearGradient(0,yBase-amp*2,0,h);
-    grad.addColorStop(0,`rgba(${mix[0]},${mix[1]},${mix[2]},${alpha})`);
-    grad.addColorStop(1,`rgba(${mix[0]},${mix[1]},${mix[2]},0)`);
-    ctx.fillStyle=grad;ctx.fill();
-  }
-
-  function animate(){
-    requestAnimationFrame(animate);
-    time+=0.016;
-    level=getLevel();
-    levelSmooth=levelSmooth*0.85+level*0.15;
-    ctx.clearRect(0,0,w,h);
-    const ampBoost=CONFIG.maxBoost*Math.pow(levelSmooth,0.9);
-    const yBase=h*0.35;
-    for(let i=0;i<CONFIG.layers;i++){
-      const depth=i+1;
-      const amp=(CONFIG.baseAmp+ampBoost*(1-i*0.2))*(1-i*0.12);
-      drawWave(yBase+depth*16,amp,CONFIG.alpha[i]||0.35,CONFIG.speed[i]||1);
-    }
-  }
-  animate();
-
-  recordBtn.addEventListener('click',async()=>{
-    try{
-      await ensureMic();
-      if(!isRecording){
-        const mime=MediaRecorder.isTypeSupported('audio/webm;codecs=opus')
-          ?'audio/webm;codecs=opus':'audio/webm';
-        mediaRecorder=new MediaRecorder(micStream,{mimeType:mime});
-        audioChunks=[];
-        mediaRecorder.ondataavailable=e=>{if(e.data.size)audioChunks.push(e.data);};
-        mediaRecorder.onstop=()=>{
-          const blob=new Blob(audioChunks,{type:mime});
-          const url=URL.createObjectURL(blob);
-          const a=document.createElement('a');
-          a.href=url;
-          a.download=`vrook_record_${new Date().toISOString().replace(/[:.]/g,'-')}.webm`;
-          a.click();URL.revokeObjectURL(url);
-        };
-        mediaRecorder.start();
-        isRecording=true;
-        recordBtn.textContent='🟥';
-        recStartMs=Date.now();
-        recTimerEl.textContent='00:00';
-        recLabel.textContent='녹음 중입니다';
-        recCard.classList.remove('done');
-        recIndicator.classList.add('show'); // ✅ fade-in 표시
-        recTicker&&clearInterval(recTicker);
-        recTicker=setInterval(()=>recTimerEl.textContent=formatDuration(Date.now()-recStartMs),200);
-      }else{
-        mediaRecorder.stop();
-        isRecording=false;
-        recordBtn.textContent='🔴 녹음 시작';
-        recLabel.textContent='녹음이 완료되었습니다';
-        recCard.classList.add('done');
-        recTicker&&clearInterval(recTicker);
+      let w = 0, h = 0, time = 0, level = 0, levelSmooth = 0;
+      function resize() {
+        const rect = canvas.getBoundingClientRect();
+        canvas.width = Math.ceil(rect.width * devicePixelRatio);
+        canvas.height = Math.ceil(rect.height * devicePixelRatio);
+        ctx.setTransform(devicePixelRatio, 0, 0, devicePixelRatio, 0, 0);
+        w = rect.width; h = rect.height;
       }
-    }catch(e){
-      alert('녹음을 시작할 수 없습니다. 권한 또는 장치를 확인해주세요.');
-      console.error(e);
-    }
-  });
-})();
-</script>
+      addEventListener('resize', resize, { passive: true }); resize();
+
+      const hexToRgb = hex => { const n = parseInt(hex.slice(1), 16); return [(n >> 16) & 255, (n >> 8) & 255, n & 255] };
+      const lerpColor = (c1, c2, t) => c1.map((v, i) => Math.round(v + (c2[i] - v) * t));
+      const BASE_RGB = hexToRgb(BASE_HEX), ACTIVE_RGB = hexToRgb(ACTIVE_HEX);
+      const pad2 = n => n.toString().padStart(2, '0');
+      const formatDuration = (ms) => {
+        const total = Math.floor(ms / 1000);
+        const h = Math.floor(total / 3600);
+        const m = Math.floor((total % 3600) / 60);
+        const s = total % 60;
+        return `${pad2(h)}:${pad2(m)}:${pad2(s)}`;
+      };
+      async function ensureMic() {
+        if (micStream) return;
+        micStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        const src = audioCtx.createMediaStreamSource(micStream);
+        analyser = new AnalyserNode(audioCtx, { fftSize: 1024 });
+        src.connect(analyser);
+        dataArray = new Uint8Array(analyser.frequencyBinCount);
+      }
+
+      function getLevel() {
+        if (!analyser) return 0;
+        analyser.getByteTimeDomainData(dataArray);
+        let sum = 0;
+        for (let i = 0; i < dataArray.length; i++) {
+          const v = (dataArray[i] - 128) / 128; sum += v * v;
+        }
+        const rms = Math.sqrt(sum / dataArray.length);
+        return Math.min(1, Math.max(0, (rms - 0.02) / 0.28));
+      }
+
+      function drawWave(yBase, amp, alpha, phaseSpeed) {
+        // 웨이브 경로
+        ctx.beginPath();
+        const step = 8;
+        for (let x = 0; x <= w; x += step) {
+          const t = time * phaseSpeed + x * 0.012;
+          const y = yBase
+            - Math.sin(t) * amp * 0.9
+            - Math.cos(t * 0.7) * amp * 0.4;
+          if (x === 0) ctx.moveTo(0, y);
+          else ctx.lineTo(x, y);
+        }
+        ctx.lineTo(w, h); ctx.lineTo(0, h); ctx.closePath();
+
+        // 🎨 색 보간: 감도 부스트 + 감마 + 녹음 중 최소 빨강 보장
+        let tColor = Math.min(1, levelSmooth * COLOR_SENSITIVITY); // 감도 부스트
+        tColor = Math.pow(tColor, COLOR_GAMMA);                     // 감마 곡선
+        if (isRecording) tColor = Math.max(tColor, MIN_ACTIVE_MIX); // 녹음 중 최소치
+
+        const c = lerpColor(BASE_RGB, ACTIVE_RGB, tColor);
+
+        // 그라데이션 채움 (위쪽 진하게 → 아래쪽 투명)
+        const grad = ctx.createLinearGradient(0, yBase - amp * 2, 0, h);
+        grad.addColorStop(0, `rgba(${c[0]}, ${c[1]}, ${c[2]}, ${alpha})`);
+        grad.addColorStop(1, `rgba(${c[0]}, ${c[1]}, ${c[2]}, 0)`);
+        ctx.fillStyle = grad;
+        ctx.fill();
+      }
+
+      function animate() {
+        requestAnimationFrame(animate);
+        time += 0.016;
+        level = getLevel();
+        levelSmooth = levelSmooth * 0.85 + level * 0.15;
+        ctx.clearRect(0, 0, w, h);
+        const ampBoost = CONFIG.maxBoost * Math.pow(levelSmooth, 0.9);
+        const yBase = h * 0.35;
+        for (let i = 0; i < CONFIG.layers; i++) {
+          const depth = i + 1;
+          const amp = (CONFIG.baseAmp + ampBoost * (1 - i * 0.2)) * (1 - i * 0.12);
+          drawWave(yBase + depth * 16, amp, CONFIG.alpha[i] || 0.35, CONFIG.speed[i] || 1);
+        }
+      }
+      animate();
+
+      recordBtn.addEventListener('click', async () => {
+        try {
+          await ensureMic();
+          if (!isRecording) {
+            const mime = MediaRecorder.isTypeSupported('audio/webm;codecs=opus')
+              ? 'audio/webm;codecs=opus' : 'audio/webm';
+            mediaRecorder = new MediaRecorder(micStream, { mimeType: mime });
+            audioChunks = [];
+            mediaRecorder.ondataavailable = e => { if (e.data.size) audioChunks.push(e.data); };
+            mediaRecorder.onstop = () => {
+              const blob = new Blob(audioChunks, { type: mime });
+              const url = URL.createObjectURL(blob);
+              const a = document.createElement('a');
+              a.href = url;
+              a.download = `vrook_record_${new Date().toISOString().replace(/[:.]/g, '-')}.webm`;
+              a.click(); URL.revokeObjectURL(url);
+            };
+            mediaRecorder.start();
+            isRecording = true;
+            recordBtn.textContent = '🟥';
+            recStartMs = Date.now();
+            recTimerEl.textContent = '00:00';
+            recLabel.textContent = '녹음 중입니다';
+            recCard.classList.remove('done');
+            recIndicator.classList.add('show'); // ✅ fade-in 표시
+            recTicker && clearInterval(recTicker);
+            recTicker = setInterval(() => recTimerEl.textContent = formatDuration(Date.now() - recStartMs), 200);
+          } else {
+            mediaRecorder.stop();
+            isRecording = false;
+            recordBtn.textContent = '🔴 녹음 시작';
+            recLabel.textContent = '녹음이 완료되었습니다';
+            recCard.classList.add('done');
+            recTicker && clearInterval(recTicker);
+          }
+        } catch (e) {
+          alert('녹음을 시작할 수 없습니다. 권한 또는 장치를 확인해주세요.');
+          console.error(e);
+        }
+      });
+    })();
+  </script>
 </body>
+
 </html>
