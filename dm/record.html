@@ -56,7 +56,7 @@
       border: 1px solid #ffffff33;
       padding: 10px 14px;
       border-radius: 999px;
-      backdrop-filter: blur(6px);
+      backdrop-filter: blur(8px);
       font-weight: 600;
       cursor: pointer;
       margin-top: 20px;
@@ -225,7 +225,6 @@
       }
 
       function drawWave(yBase, amp, alpha, phaseSpeed) {
-        // 웨이브 경로
         ctx.beginPath();
         const step = 8;
         for (let x = 0; x <= w; x += step) {
@@ -236,19 +235,26 @@
           if (x === 0) ctx.moveTo(0, y);
           else ctx.lineTo(x, y);
         }
-        ctx.lineTo(w, h); ctx.lineTo(0, h); ctx.closePath();
+        ctx.lineTo(w, h);
+        ctx.lineTo(0, h);
+        ctx.closePath();
 
-        // 🎨 색 보간: 감도 부스트 + 감마 + 녹음 중 최소 빨강 보장
-        let tColor = Math.min(1, levelSmooth * COLOR_SENSITIVITY); // 감도 부스트
-        tColor = Math.pow(tColor, COLOR_GAMMA);                     // 감마 곡선
-        if (isRecording) tColor = Math.max(tColor, MIN_ACTIVE_MIX); // 녹음 중 최소치
+        // 🎨 색상 처리
+        let grad;
 
-        const c = lerpColor(BASE_RGB, ACTIVE_RGB, tColor);
+        if (isRecording) {
+          /** ✅ 녹음 중: 고정 그라데이션 (#fc6767 → #ec008c) */
+          grad = ctx.createLinearGradient(0, 0, w, 0);
+          grad.addColorStop(0, "rgba(252, 103, 103, 0.9)"); // #fc6767
+          grad.addColorStop(1, "rgba(236, 0, 140, 0.9)");  // #ec008c
+        } else {
+          /** ✅ 기본 상태: 흰색 → 투명 (부드럽게 페이드) */
+          const mix = lerpColor(BASE_RGB, ACTIVE_RGB, levelSmooth);
+          grad = ctx.createLinearGradient(0, yBase - amp * 2, 0, h);
+          grad.addColorStop(0, `rgba(${mix[0]},${mix[1]},${mix[2]},${alpha})`);
+          grad.addColorStop(1, `rgba(${mix[0]},${mix[1]},${mix[2]},0)`);
+        }
 
-        // 그라데이션 채움 (위쪽 진하게 → 아래쪽 투명)
-        const grad = ctx.createLinearGradient(0, yBase - amp * 2, 0, h);
-        grad.addColorStop(0, `rgba(${c[0]}, ${c[1]}, ${c[2]}, ${alpha})`);
-        grad.addColorStop(1, `rgba(${c[0]}, ${c[1]}, ${c[2]}, 0)`);
         ctx.fillStyle = grad;
         ctx.fill();
       }
