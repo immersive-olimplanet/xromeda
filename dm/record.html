@@ -176,11 +176,11 @@
       const recLabel = document.getElementById('recLabel');
       const recTimerEl = document.getElementById('recTimer');
 
-      const CONFIG = { layers: 3, baseAmp: 22, maxBoost: 100, speed: [0.85, 1.1, 1.5], alpha: [0.6, 0.48, 0.38] };
+      const CONFIG = { layers: 3, baseAmp: 22, maxBoost: 80, speed: [0.85, 1.1, 1.5], alpha: [0.6, 0.48, 0.38] };
       const BASE_HEX = "#FFFFFF", ACTIVE_HEX = "#FE4141";
       const COLOR_SENSITIVITY = 2.2;   // 마이크 감도 부스트(1.0~3.0 권장)
       const COLOR_GAMMA = 0.7;         // 곡선(0.5~1.0, 작을수록 민감)
-      const MIN_ACTIVE_MIX = 0.4;     // 녹음 중 최소 빨강 비율 보장(0~1)
+      const MIN_ACTIVE_MIX = 0.8;     // 녹음 중 최소 빨강 비율 보장(0~1)
 
       let w = 0, h = 0, time = 0, level = 0, levelSmooth = 0;
       function resize() {
